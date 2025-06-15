@@ -8,7 +8,7 @@ authors = [
     { name = "Krishna Noutiyal"}
 ]
 dependencies = [
-  "flet","openpyxl","pandas"
+  "flet", "openpyxl", "pandas", "toml"
 ]
 
 [tool.flet]
