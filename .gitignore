@@ -1,0 +1,8 @@
+.venv
+test/
+__pycache__/
+build/
+dist/
+certs/
+release/
+storage/
