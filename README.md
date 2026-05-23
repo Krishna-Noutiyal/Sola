@@ -84,7 +84,7 @@ The structure of the project is as follows :
 - **`README.md`**: The thing you are reading now.
 - **`./build.ps1`**: The build script of Sola. Also used to install requirements.
 - **`./main.py`**: The main file that starts the execution of Sola.
-- **`./myproject.toml`**: Details of Sola project.
+- **`./pyproject.toml`**: Details of Sola project.
 - **`./requirements.txt`**: Packages required by Sola.
 
 ## Dependencies 🚴

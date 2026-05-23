@@ -6,3 +6,4 @@ dist/
 certs/
 release/
 storage/
+*.lock

@@ -9,8 +9,8 @@ class Router:
         self.setup_page()
     
     def setup_page(self):
-        # Get path to myproject.toml (one directory above)
-        toml_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "myproject.toml")
+        # Get path to pyproject.toml (one directory above)
+        toml_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "pyproject.toml")
         with open(toml_path, "r") as f:
             data = toml.load(f)
             

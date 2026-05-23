@@ -285,9 +285,7 @@ class ExcelProcessor:
             phc_self = details.get("Health Checkup Exp (Employee & family)", "")[0]
 
             if not isnan(phc_self):
-                self.ws["C68"] = (
-                    phc_self if ((phc_self <= 5000)) else 5000
-                )
+                self.ws["C68"] = phc_self if ((phc_self <= 5000)) else 5000
             else:
                 self.ws["C68"] = 0
 
@@ -295,11 +293,9 @@ class ExcelProcessor:
             phc_parents = details.get(
                 "Medical Exp (If Parents are Senior Citizen)", ""
             )[0]
-            
+
             if not isnan(phc_parents):
-                self.ws["C73"] = (
-                    phc_parents if (phc_parents <= 50000) else 50000
-                )
+                self.ws["C73"] = phc_parents if (phc_parents <= 50000) else 50000
             else:
                 self.ws["C73"] = 0
 
