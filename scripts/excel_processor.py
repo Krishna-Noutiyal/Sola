@@ -117,7 +117,8 @@ class ExcelProcessor:
             val2 = df.iat[row, 3]  # Column D (index 3)
             self.data[key] = [val1, val2]
         # D13 is row 12 (0-indexed), column 3 (0-indexed)
-        self.data["passwd"] = df.iat[12, 3]
+        # This password is created by the employee of Pooja ITR
+        self.data["new_passwd"] = df.iat[12, 3]
 
         """ ################## Extracting Home Loan Details ################## """
 
@@ -143,6 +144,14 @@ class ExcelProcessor:
         self.data["HL_loan_outstanding2"] = df.iat[4, 5]
         self.data["HL_loan_interest2"] = df.iat[4, 6]
 
+        # Home Loan Details 3rd Bank
+        self.data["HL_bank_name3"] = df.iat[5, 1]
+        self.data["HL_loan_ac_number3"] = df.iat[5, 2]
+        self.data["HL_date_of_sanction3"] = df.iat[5, 3]
+        self.data["HL_total_loan_amount3"] = df.iat[5, 4]
+        self.data["HL_loan_outstanding3"] = df.iat[5, 5]
+        self.data["HL_loan_interest3"] = df.iat[5, 6]
+
         """ ################## Extracting Health Insurance Details ################## """
 
         print("\033[1;32mExtracting Health Insurance Details...\033[0m\n")
@@ -152,24 +161,46 @@ class ExcelProcessor:
         df = pd.read_excel(file_path, sheet_name="Health Insurance", header=None)
 
         # Health Insurance Details for Self 1st Company
-        self.data["HI_self_company_name"] = df.iat[2, 1]
-        self.data["HI_self_policy_number"] = df.iat[2, 2]
-        self.data["HI_self_premium_amount"] = df.iat[2, 3]
+        self.data["HI_self_company_name"] = df.iat[3, 1]
+        self.data["HI_self_policy_number"] = df.iat[3, 2]
+        self.data["HI_self_premium_amount"] = df.iat[3, 3]
+        self.data["HI_self_checkup_amount"] = df.iat[3, 4]
+        self.data["HI_self_medical_expenditure"] = df.iat[3, 5]
 
         # Health Insurance Details for Self 2nd Company
-        self.data["HI_self_company_name2"] = df.iat[3, 1]
-        self.data["HI_self_policy_number2"] = df.iat[3, 2]
-        self.data["HI_self_premium_amount2"] = df.iat[3, 3]
+        self.data["HI_self_company_name2"] = df.iat[4, 1]
+        self.data["HI_self_policy_number2"] = df.iat[4, 2]
+        self.data["HI_self_premium_amount2"] = df.iat[4, 3]
+        self.data["HI_self_checkup_amount2"] = df.iat[4, 4]
+        self.data["HI_self_medical_expenditure2"] = df.iat[4, 5]
+
+        # Health Insurance Details for Self 3rd Company
+        self.data["HI_self_company_name3"] = df.iat[5, 1]
+        self.data["HI_self_policy_number3"] = df.iat[5, 2]
+        self.data["HI_self_premium_amount3"] = df.iat[5, 3]
+        self.data["HI_self_checkup_amount3"] = df.iat[5, 4]
+        self.data["HI_self_medical_expenditure3"] = df.iat[5, 5]
 
         # Health Insurance Details for Parents
-        self.data["HI_parents_company_name"] = df.iat[9, 1]
-        self.data["HI_parents_policy_number"] = df.iat[9, 2]
-        self.data["HI_parents_premium_amount"] = df.iat[9, 3]
+        self.data["HI_parents_company_name"] = df.iat[11, 1]
+        self.data["HI_parents_policy_number"] = df.iat[11, 2]
+        self.data["HI_parents_premium_amount"] = df.iat[11, 3]
+        self.data["HI_parents_checkup_amount"] = df.iat[11, 4]
+        self.data["HI_parents_medical_expenditure"] = df.iat[11, 5]
 
         # Health Insurance Details for Parents 2nd Company
-        self.data["HI_parents_company_name2"] = df.iat[10, 1]
-        self.data["HI_parents_policy_number2"] = df.iat[10, 2]
-        self.data["HI_parents_premium_amount2"] = df.iat[10, 3]
+        self.data["HI_parents_company_name2"] = df.iat[12, 1]
+        self.data["HI_parents_policy_number2"] = df.iat[12, 2]
+        self.data["HI_parents_premium_amount2"] = df.iat[12, 3]
+        self.data["HI_parents_checkup_amount2"] = df.iat[12, 4]
+        self.data["HI_parents_medical_expenditure2"] = df.iat[12, 5]
+
+        # Health Insurance Details for Parents 3rd Company
+        self.data["HI_parents_company_name3"] = df.iat[13, 1]
+        self.data["HI_parents_policy_number3"] = df.iat[13, 2]
+        self.data["HI_parents_premium_amount3"] = df.iat[13, 3]
+        self.data["HI_parents_checkup_amount3"] = df.iat[13, 4]
+        self.data["HI_parents_medical_expenditure3"] = df.iat[13, 5]
 
         """ ################## Extracting Education Loan Details ################## """
 
@@ -195,6 +226,14 @@ class ExcelProcessor:
         self.data["EL_loan_outstanding2"] = df.iat[4, 5]
         self.data["EL_loan_interest2"] = df.iat[4, 6]
 
+        # Education Loan Details 3rd Bank
+        self.data["EL_bank_name3"] = df.iat[5, 1]
+        self.data["EL_loan_ac_number3"] = df.iat[5, 2]
+        self.data["EL_date_of_sanction3"] = df.iat[5, 3]
+        self.data["EL_total_loan_amount3"] = df.iat[5, 4]
+        self.data["EL_loan_outstanding3"] = df.iat[5, 5]
+        self.data["EL_loan_interest3"] = df.iat[5, 6]
+
         """ ################## Extracting Donation Details ################## """
 
         print("\033[1;33mExtracting Donation Details...\033[0m\n")
@@ -207,13 +246,25 @@ class ExcelProcessor:
         self.data["pan_of_donee"] = df.iat[3, 1]
         self.data["name_of_donee"] = df.iat[3, 2]
         self.data["address_of_donee"] = df.iat[3, 3]
-        self.data["donation_amount"] = df.iat[3, 4]
+        self.data["TRN_of_donee"] = df.iat[3, 4]
+        self.data["IFSC_of_donee"] = df.iat[3, 5]
+        self.data["donation_of_donee"] = df.iat[3, 6]
 
         # Donation Details 2nd Organization
         self.data["pan_of_donee2"] = df.iat[4, 1]
         self.data["name_of_donee2"] = df.iat[4, 2]
         self.data["address_of_donee2"] = df.iat[4, 3]
-        self.data["donation_amount2"] = df.iat[4, 4]
+        self.data["TRN_of_donee2"] = df.iat[4, 4]
+        self.data["IFSC_of_donee2"] = df.iat[4, 5]
+        self.data["donation_of_donee2"] = df.iat[4, 6]
+
+        # Donation Details 3rd Organization
+        self.data["pan_of_donee3"] = df.iat[5, 1]
+        self.data["name_of_donee3"] = df.iat[5, 2]
+        self.data["address_of_donee3"] = df.iat[5, 3]
+        self.data["TRN_of_donee3"] = df.iat[5, 4]
+        self.data["IFSC_of_donee3"] = df.iat[5, 5]
+        self.data["donation_of_donee3"] = df.iat[5, 6]
 
         print("\033[1;32m\tDetails extracted successfully:\033[0m\n")
 
@@ -245,16 +296,17 @@ class ExcelProcessor:
 
             """################ Income from Other Sources ################"""
 
-            self.ws["C35"] = details.get("Interest on Saving A/c", "")[0]
-            self.ws["C36"] = details.get("Interest on FD/RD/MIS", "")[0]
+            self.ws["C38"] = details.get("Interest on Saving A/c", "")[0]
+            self.ws["C39"] = details.get("Interest on FD/RD/MIS", "")[0]
 
             """################ Deductions under 80C ################"""
 
+            self.ws["C47"] = details.get("NPS (Employee Share)", "")[0]
             self.ws["F44"] = details.get("NPS PRAN No. (NPS Employee)", "")
-            self.ws["F45"] = details.get("PF A/c No. (GPF/EPF Employee)", "")
+            self.ws["F48"] = details.get("PF A/c No. (GPF/EPF Employee)", "")
 
             fields = [
-                "LIC",
+                "Life Insurance Premium",
                 "PPF",
                 "SSY",
                 "PLI",
@@ -268,8 +320,8 @@ class ExcelProcessor:
                 "Home Loan Principal",
             ]
             for i, field in enumerate(fields):
-                saving_name = f"C{49 + i}"
-                document_number = f"F{49 + i}"
+                saving_name = f"C{52 + i}"
+                document_number = f"F{52 + i}"
 
                 self.ws[saving_name] = details.get(field, "")[0]
                 self.ws[document_number] = details.get(field, "")[1]
@@ -277,7 +329,8 @@ class ExcelProcessor:
             """################ 80CCD(1B) -NPS Employee Contribution ################"""
 
             # NPS PRAN No. (NPS Employee)
-            self.ws["F63"] = details.get("NPS PRAN No. (NPS Employee)", "")
+            self.ws["F47"] = details.get("NPS PRAN No. (NPS Employee)", "")
+            self.ws["F66"] = details.get("NPS PRAN No. (NPS Employee)", "")
 
             """################ 80D - Deductions for Medical Expenses ################"""
 
@@ -305,7 +358,7 @@ class ExcelProcessor:
             # Now the self.ws is already set to the "IT Calculation" sheet,
             self._select_worksheet(self.form16, sheet_name="IT Calculation")
 
-            self.ws["D18"] = details.get("TDS/Tax Deducted", "")[0]
+            self.ws["C17"] = details.get("TDS/Tax Deducted", "")[0]
 
             """################ HRA Sheet ################"""
 
@@ -337,6 +390,14 @@ class ExcelProcessor:
             self.ws["G5"] = details.get("HL_loan_outstanding2", "")
             self.ws["H5"] = details.get("HL_loan_interest2", "")
 
+            # Home Loan Details 3rd Bank
+            self.ws["C6"] = details.get("HL_bank_name3", "")
+            self.ws["D6"] = details.get("HL_loan_ac_number3", "")
+            self.ws["E6"] = details.get("HL_date_of_sanction3", "")
+            self.ws["F6"] = details.get("HL_total_loan_amount3", "")
+            self.ws["G6"] = details.get("HL_loan_outstanding3", "")
+            self.ws["H6"] = details.get("HL_loan_interest3", "")
+
             """################ Education Loan Sheet ################"""
 
             # Load the Education Loan Sheet
@@ -359,6 +420,14 @@ class ExcelProcessor:
             self.ws["G5"] = details.get("EL_loan_outstanding2", "")
             self.ws["H5"] = details.get("EL_loan_interest2", "")
 
+            # Education Loan Details 3rd Bank
+            self.ws["C6"] = details.get("EL_bank_name3", "")
+            self.ws["D6"] = details.get("EL_loan_ac_number3", "")
+            self.ws["E6"] = details.get("EL_date_of_sanction3", "")
+            self.ws["F6"] = details.get("EL_total_loan_amount3", "")
+            self.ws["G6"] = details.get("EL_loan_outstanding3", "")
+            self.ws["H6"] = details.get("EL_loan_interest3", "")
+
             """################ Health Insurance Sheet ################"""
 
             # Load the Health Insurance Sheet
@@ -369,21 +438,43 @@ class ExcelProcessor:
             self.ws["B4"] = details.get("HI_self_company_name", "")
             self.ws["C4"] = details.get("HI_self_policy_number", "")
             self.ws["D4"] = details.get("HI_self_premium_amount", "")
+            self.ws["E4"] = details.get("HI_self_checkup_amount", "")
+            self.ws["F4"] = details.get("HI_self_medical_expenditure", "")
 
             # Health Insurance Details for Self 2nd Company
             self.ws["B5"] = details.get("HI_self_company_name2", "")
             self.ws["C5"] = details.get("HI_self_policy_number2", "")
             self.ws["D5"] = details.get("HI_self_premium_amount2", "")
+            self.ws["E5"] = details.get("HI_self_checkup_amount2", "")
+            self.ws["F5"] = details.get("HI_self_medical_expenditure2", "")
 
-            # Health Insurance Details for Self 1st Company
-            self.ws["B11"] = details.get("HI_parents_company_name", "")
-            self.ws["C11"] = details.get("HI_parents_policy_number", "")
-            self.ws["D11"] = details.get("HI_parents_premium_amount", "")
+            # Health Insurance Details for Self 3rd Company
+            self.ws["B6"] = details.get("HI_self_company_name3", "")
+            self.ws["C6"] = details.get("HI_self_policy_number3", "")
+            self.ws["D6"] = details.get("HI_self_premium_amount3", "")
+            self.ws["E6"] = details.get("HI_self_checkup_amount3", "")
+            self.ws["F6"] = details.get("HI_self_medical_expenditure3", "")
 
-            # Health Insurance Details for Self 2nd Company
-            self.ws["B12"] = details.get("HI_parents_company_name2", "")
-            self.ws["C12"] = details.get("HI_parents_policy_number2", "")
-            self.ws["D12"] = details.get("HI_parents_premium_amount2", "")
+            # Health Insurance Details for Parents 1st Company
+            self.ws["B12"] = details.get("HI_parents_company_name", "")
+            self.ws["C12"] = details.get("HI_parents_policy_number", "")
+            self.ws["D12"] = details.get("HI_parents_premium_amount", "")
+            self.ws["E12"] = details.get("HI_parents_checkup_amount", "")
+            self.ws["F12"] = details.get("HI_parents_medical_expenditure", "")
+
+            # Health Insurance Details for Parents 2nd Company
+            self.ws["B13"] = details.get("HI_parents_company_name2", "")
+            self.ws["C13"] = details.get("HI_parents_policy_number2", "")
+            self.ws["D13"] = details.get("HI_parents_premium_amount2", "")
+            self.ws["E13"] = details.get("HI_parents_checkup_amount2", "")
+            self.ws["F13"] = details.get("HI_parents_medical_expenditure2", "")
+
+            # Health Insurance Details for Parents 3rd Company
+            self.ws["B14"] = details.get("HI_parents_company_name3", "")
+            self.ws["C14"] = details.get("HI_parents_policy_number3", "")
+            self.ws["D14"] = details.get("HI_parents_premium_amount3", "")
+            self.ws["E14"] = details.get("HI_parents_checkup_amount3", "")
+            self.ws["F14"] = details.get("HI_parents_medical_expenditure3", "")
 
             """################ Donation Sheet ################"""
 
@@ -392,16 +483,28 @@ class ExcelProcessor:
             self._select_worksheet(self.form16, sheet_name="Donation")
 
             # Donation Details for the 1st Donee
-            self.ws["B3"] = details.get("name_of_donee", "")
-            self.ws["C3"] = details.get("address_of_donee", "")
-            self.ws["D3"] = details.get("pan_of_donee", "")
-            self.ws["E3"] = details.get("donation_amount", "")
+            self.ws["B4"] = details.get("pan_of_donee", "")
+            self.ws["C4"] = details.get("name_of_donee", "")
+            self.ws["D4"] = details.get("address_of_donee", "")
+            self.ws["E4"] = details.get("TRN_of_donee", "")
+            self.ws["F4"] = details.get("IFSC_of_donee", "")
+            self.ws["G4"] = details.get("donation_of_donee", "")
 
             # Donation Details for the 2nd Donee
-            self.ws["B4"] = details.get("name_of_donee2", "")
-            self.ws["C4"] = details.get("address_of_donee2", "")
-            self.ws["D4"] = details.get("pan_of_donee2", "")
-            self.ws["E4"] = details.get("donation_amount2", "")
+            self.ws["B5"] = details.get("pan_of_donee2", "")
+            self.ws["C5"] = details.get("name_of_donee2", "")
+            self.ws["D5"] = details.get("address_of_donee2", "")
+            self.ws["E5"] = details.get("TRN_of_donee2", "")
+            self.ws["F5"] = details.get("IFSC_of_donee2", "")
+            self.ws["G5"] = details.get("donation_of_donee2", "")
+
+            # Donation Details for the 3rd Donee
+            self.ws["B6"] = details.get("pan_of_donee3", "")
+            self.ws["C6"] = details.get("name_of_donee3", "")
+            self.ws["D6"] = details.get("address_of_donee3", "")
+            self.ws["E6"] = details.get("TRN_of_donee3", "")
+            self.ws["F6"] = details.get("IFSC_of_donee3", "")
+            self.ws["G6"] = details.get("donation_of_donee3", "")
 
             # Saving the Form-16 workbook
             self.form16.save(form_16)
@@ -413,11 +516,11 @@ class ExcelProcessor:
             return False
 
 
-if __name__ == "__main__":
-    # Create an instance of CSVProcessor
-    test = ExcelProcessor()
+# if __name__ == "__main__":
+#     # Create an instance of CSVProcessor
+#     test = ExcelProcessor()
 
-    test.create_form_16(
-        itr_format="form-16_generator/test/ITR Format (PIC).xlsx",
-        form_16="form-16_generator/test/Form-16.xlsx",
-    )
+#     test.create_form_16(
+#         itr_format="form-16_generator/test/ITR Format (PIC).xlsx",
+#         form_16="form-16_generator/test/Form-16.xlsx",
+#     )
