@@ -28,10 +28,10 @@ class MainView:
             allowed_extensions=["xlsx"],
         )
         if files:
-            self.selected_files = files[0]
-            self.file_path = self.selected_files.path
-            file_names = self.selected_files.name
-            self.selected_file_text.value = f"ITR Format: {', '.join(file_names)}"
+            self.selected_file = files[0]
+            self.file_path = self.selected_file.path
+            file_name = self.selected_file.name
+            self.selected_file_text.value = f"ITR Format: {file_name}"
             self.selected_file_text.color = ColorScheme.SUCCESS
         else:
             self.selected_files = ""
@@ -56,7 +56,7 @@ class MainView:
         self.page.update()
 
     def on_submit_clicked(self, e):
-        if not self.selected_files:
+        if not self.selected_file:
             self.show_status("Please Select ITR Format !", ColorScheme.ERROR)
             return
 
