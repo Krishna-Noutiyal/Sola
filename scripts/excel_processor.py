@@ -9,6 +9,7 @@ class ExcelProcessor:
 
     def __init__(self, is_retired: bool = False):
         self.is_retired = is_retired
+        self.data = {}
 
     def _select_form16(self, file_name: str, sheet_name: str = "FORM-16") -> None:
         """
@@ -102,7 +103,6 @@ class ExcelProcessor:
         Side Effects:
             Populates self.data with the extracted information.
         """
-        self.data = {}
 
         print("\033[1;37m\033[1mStarting extraction...\033[0m\n")
         df = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
@@ -281,33 +281,46 @@ class ExcelProcessor:
         """
         Create Form-16 from the given ITR format file.
         """
+        self._extract_details(itr_format)
+
+        try:
+            # Fills the common details present in both Retired & Salaried Form-16
+            self._fill_general_details(form_16)
+
+            if self.is_retired:
+                return self._create_form_16_retired(form_16)
+            else:
+                return self._create_form_16_salaried(form_16)
+
+            return True
+        except Exception as e:
+            print(f"Error creating Form-16: {e}")
+            return False
+
+    def _fill_general_details(self, form_16: str) -> bool:
         try:
 
-            """################ Detail Extraction ################"""
-            # Extract details from the ITR format file
-            details = self._extract_details(itr_format)
-
-            """################ Form-16 Sheet ################"""  # TODO: UPDATE FORM 16 ENTRIES
+            """################ Form-16 Sheet ################"""
             # Load the Form-16 template
             self._select_form16(form_16, sheet_name="FORM-16")
 
             # Update the value of cell A1 in the worksheet
             # Write "Name, Designation, Department" in cell A1 using values from details dict
-            name = details.get("Name", "")
-            designation = details.get("Designation", "")
-            department = details.get("Department/Company", "")
+            name = self.data.get("Name", "")
+            designation = self.data.get("Designation", "")
+            department = self.data.get("Department/Company", "")
             self.ws["A1"] = f"{name}, {designation}, {department}".upper()
 
             """################ Income from Other Sources ################"""
 
-            self.ws["C41"] = details.get("Interest on Saving A/c", "")[0]
-            self.ws["C42"] = details.get("Interest on FD/RD/MIS", "")[0]
+            self.ws["C41"] = self.data.get("Interest on Saving A/c", "")[0]
+            self.ws["C42"] = self.data.get("Interest on FD/RD/MIS", "")[0]
 
             """################ Deductions under 80C ################"""
 
-            self.ws["C50"] = details.get("NPS (Employee Share)", "")[0]
-            self.ws["F50"] = details.get("NPS PRAN No. (NPS Employee)", "")
-            self.ws["F51"] = details.get("PF A/c No. (GPF/EPF Employee)", "")
+            self.ws["C50"] = self.data.get("NPS (Employee Share)", "")[0]
+            self.ws["F50"] = self.data.get("NPS PRAN No. (NPS Employee)", "")
+            self.ws["F51"] = self.data.get("PF A/c No. (GPF/EPF Employee)", "")
 
             fields = [
                 "Life Insurance Premium",
@@ -327,21 +340,18 @@ class ExcelProcessor:
                 saving_name = f"C{55 + i}"
                 document_number = f"F{55 + i}"
 
-                self.ws[saving_name] = details.get(field, "")[0]
-                self.ws[document_number] = details.get(field, "")[1]
+                self.ws[saving_name] = self.data.get(field, "")[0]
+                self.ws[document_number] = self.data.get(field, "")[1]
 
             """################ 80CCD(1B) -NPS Employee Contribution ################"""
 
             # NPS PRAN No. (NPS Employee)
-            self.ws["F69"] = details.get("NPS PRAN No. (NPS Employee)", "")
+            self.ws["F69"] = self.data.get("NPS PRAN No. (NPS Employee)", "")
 
-            """################ IT Calculation Sheet ################"""  # TODO: UPDATE THIS SHEET
+            """################ Other Details are going to be filled by respective methods ################"""
 
-            # Load the IT Calculation Sheet
-            # Now the self.ws is already set to the "IT Calculation" sheet,
-            self._select_worksheet(self.form16, sheet_name="IT Calculation")
-
-            self.ws["C18"] = details.get("TDS/Tax Deducted", "")[0]
+            # self._create_form_16_salaried
+            # self._create_form_16_retired
 
             """################ HRA Sheet ################"""
 
@@ -349,7 +359,7 @@ class ExcelProcessor:
             # Now the self.ws is already set to the "HRA" sheet,
             self._select_worksheet(self.form16, sheet_name="HRA")
 
-            self.ws["C4"] = details.get("House Rent", "")[0]
+            self.ws["C4"] = self.data.get("House Rent", "")[0]
 
             """################ Home Loan Sheet ################"""
 
@@ -358,28 +368,28 @@ class ExcelProcessor:
             self._select_worksheet(self.form16, sheet_name="HL")
 
             # Home Loan Details 1st Bank
-            self.ws["C4"] = details.get("HL_bank_name", "")
-            self.ws["D4"] = details.get("HL_loan_ac_number", "")
-            self.ws["E4"] = details.get("HL_date_of_sanction", "")
-            self.ws["F4"] = details.get("HL_total_loan_amount", "")
-            self.ws["G4"] = details.get("HL_loan_outstanding", "")
-            self.ws["H4"] = details.get("HL_loan_interest", "")
+            self.ws["C4"] = self.data.get("HL_bank_name", "")
+            self.ws["D4"] = self.data.get("HL_loan_ac_number", "")
+            self.ws["E4"] = self.data.get("HL_date_of_sanction", "")
+            self.ws["F4"] = self.data.get("HL_total_loan_amount", "")
+            self.ws["G4"] = self.data.get("HL_loan_outstanding", "")
+            self.ws["H4"] = self.data.get("HL_loan_interest", "")
 
             # Home Loan Details 2nd Bank
-            self.ws["C5"] = details.get("HL_bank_name2", "")
-            self.ws["D5"] = details.get("HL_loan_ac_number2", "")
-            self.ws["E5"] = details.get("HL_date_of_sanction2", "")
-            self.ws["F5"] = details.get("HL_total_loan_amount2", "")
-            self.ws["G5"] = details.get("HL_loan_outstanding2", "")
-            self.ws["H5"] = details.get("HL_loan_interest2", "")
+            self.ws["C5"] = self.data.get("HL_bank_name2", "")
+            self.ws["D5"] = self.data.get("HL_loan_ac_number2", "")
+            self.ws["E5"] = self.data.get("HL_date_of_sanction2", "")
+            self.ws["F5"] = self.data.get("HL_total_loan_amount2", "")
+            self.ws["G5"] = self.data.get("HL_loan_outstanding2", "")
+            self.ws["H5"] = self.data.get("HL_loan_interest2", "")
 
             # Home Loan Details 3rd Bank
-            self.ws["C6"] = details.get("HL_bank_name3", "")
-            self.ws["D6"] = details.get("HL_loan_ac_number3", "")
-            self.ws["E6"] = details.get("HL_date_of_sanction3", "")
-            self.ws["F6"] = details.get("HL_total_loan_amount3", "")
-            self.ws["G6"] = details.get("HL_loan_outstanding3", "")
-            self.ws["H6"] = details.get("HL_loan_interest3", "")
+            self.ws["C6"] = self.data.get("HL_bank_name3", "")
+            self.ws["D6"] = self.data.get("HL_loan_ac_number3", "")
+            self.ws["E6"] = self.data.get("HL_date_of_sanction3", "")
+            self.ws["F6"] = self.data.get("HL_total_loan_amount3", "")
+            self.ws["G6"] = self.data.get("HL_loan_outstanding3", "")
+            self.ws["H6"] = self.data.get("HL_loan_interest3", "")
 
             """################ Education Loan Sheet ################"""
 
@@ -388,28 +398,28 @@ class ExcelProcessor:
             self._select_worksheet(self.form16, sheet_name="EL")
 
             # Education Loan Details 1st Bank
-            self.ws["C4"] = details.get("EL_bank_name", "")
-            self.ws["D4"] = details.get("EL_loan_ac_number", "")
-            self.ws["E4"] = details.get("EL_date_of_sanction", "")
-            self.ws["F4"] = details.get("EL_total_loan_amount", "")
-            self.ws["G4"] = details.get("EL_loan_outstanding", "")
-            self.ws["H4"] = details.get("EL_loan_interest", "")
+            self.ws["C4"] = self.data.get("EL_bank_name", "")
+            self.ws["D4"] = self.data.get("EL_loan_ac_number", "")
+            self.ws["E4"] = self.data.get("EL_date_of_sanction", "")
+            self.ws["F4"] = self.data.get("EL_total_loan_amount", "")
+            self.ws["G4"] = self.data.get("EL_loan_outstanding", "")
+            self.ws["H4"] = self.data.get("EL_loan_interest", "")
 
             # Education Loan Details 2nd Bank
-            self.ws["C5"] = details.get("EL_bank_name2", "")
-            self.ws["D5"] = details.get("EL_loan_ac_number2", "")
-            self.ws["E5"] = details.get("EL_date_of_sanction2", "")
-            self.ws["F5"] = details.get("EL_total_loan_amount2", "")
-            self.ws["G5"] = details.get("EL_loan_outstanding2", "")
-            self.ws["H5"] = details.get("EL_loan_interest2", "")
+            self.ws["C5"] = self.data.get("EL_bank_name2", "")
+            self.ws["D5"] = self.data.get("EL_loan_ac_number2", "")
+            self.ws["E5"] = self.data.get("EL_date_of_sanction2", "")
+            self.ws["F5"] = self.data.get("EL_total_loan_amount2", "")
+            self.ws["G5"] = self.data.get("EL_loan_outstanding2", "")
+            self.ws["H5"] = self.data.get("EL_loan_interest2", "")
 
             # Education Loan Details 3rd Bank
-            self.ws["C6"] = details.get("EL_bank_name3", "")
-            self.ws["D6"] = details.get("EL_loan_ac_number3", "")
-            self.ws["E6"] = details.get("EL_date_of_sanction3", "")
-            self.ws["F6"] = details.get("EL_total_loan_amount3", "")
-            self.ws["G6"] = details.get("EL_loan_outstanding3", "")
-            self.ws["H6"] = details.get("EL_loan_interest3", "")
+            self.ws["C6"] = self.data.get("EL_bank_name3", "")
+            self.ws["D6"] = self.data.get("EL_loan_ac_number3", "")
+            self.ws["E6"] = self.data.get("EL_date_of_sanction3", "")
+            self.ws["F6"] = self.data.get("EL_total_loan_amount3", "")
+            self.ws["G6"] = self.data.get("EL_loan_outstanding3", "")
+            self.ws["H6"] = self.data.get("EL_loan_interest3", "")
 
             """################ Health Insurance Sheet ################"""
 
@@ -418,46 +428,46 @@ class ExcelProcessor:
             self._select_worksheet(self.form16, sheet_name="HI")
 
             # Health Insurance Details for Self 1st Company
-            self.ws["B4"] = details.get("HI_self_company_name", "")
-            self.ws["C4"] = details.get("HI_self_policy_number", "")
-            self.ws["D4"] = details.get("HI_self_premium_amount", "")
-            self.ws["E4"] = details.get("HI_self_checkup_amount", "")
-            self.ws["F4"] = details.get("HI_self_medical_expenditure", "")
+            self.ws["B4"] = self.data.get("HI_self_company_name", "")
+            self.ws["C4"] = self.data.get("HI_self_policy_number", "")
+            self.ws["D4"] = self.data.get("HI_self_premium_amount", "")
+            self.ws["E4"] = self.data.get("HI_self_checkup_amount", "")
+            self.ws["F4"] = self.data.get("HI_self_medical_expenditure", "")
 
             # Health Insurance Details for Self 2nd Company
-            self.ws["B5"] = details.get("HI_self_company_name2", "")
-            self.ws["C5"] = details.get("HI_self_policy_number2", "")
-            self.ws["D5"] = details.get("HI_self_premium_amount2", "")
-            self.ws["E5"] = details.get("HI_self_checkup_amount2", "")
-            self.ws["F5"] = details.get("HI_self_medical_expenditure2", "")
+            self.ws["B5"] = self.data.get("HI_self_company_name2", "")
+            self.ws["C5"] = self.data.get("HI_self_policy_number2", "")
+            self.ws["D5"] = self.data.get("HI_self_premium_amount2", "")
+            self.ws["E5"] = self.data.get("HI_self_checkup_amount2", "")
+            self.ws["F5"] = self.data.get("HI_self_medical_expenditure2", "")
 
             # Health Insurance Details for Self 3rd Company
-            self.ws["B6"] = details.get("HI_self_company_name3", "")
-            self.ws["C6"] = details.get("HI_self_policy_number3", "")
-            self.ws["D6"] = details.get("HI_self_premium_amount3", "")
-            self.ws["E6"] = details.get("HI_self_checkup_amount3", "")
-            self.ws["F6"] = details.get("HI_self_medical_expenditure3", "")
+            self.ws["B6"] = self.data.get("HI_self_company_name3", "")
+            self.ws["C6"] = self.data.get("HI_self_policy_number3", "")
+            self.ws["D6"] = self.data.get("HI_self_premium_amount3", "")
+            self.ws["E6"] = self.data.get("HI_self_checkup_amount3", "")
+            self.ws["F6"] = self.data.get("HI_self_medical_expenditure3", "")
 
             # Health Insurance Details for Parents 1st Company
-            self.ws["B12"] = details.get("HI_parents_company_name", "")
-            self.ws["C12"] = details.get("HI_parents_policy_number", "")
-            self.ws["D12"] = details.get("HI_parents_premium_amount", "")
-            self.ws["E12"] = details.get("HI_parents_checkup_amount", "")
-            self.ws["F12"] = details.get("HI_parents_medical_expenditure", "")
+            self.ws["B12"] = self.data.get("HI_parents_company_name", "")
+            self.ws["C12"] = self.data.get("HI_parents_policy_number", "")
+            self.ws["D12"] = self.data.get("HI_parents_premium_amount", "")
+            self.ws["E12"] = self.data.get("HI_parents_checkup_amount", "")
+            self.ws["F12"] = self.data.get("HI_parents_medical_expenditure", "")
 
             # Health Insurance Details for Parents 2nd Company
-            self.ws["B13"] = details.get("HI_parents_company_name2", "")
-            self.ws["C13"] = details.get("HI_parents_policy_number2", "")
-            self.ws["D13"] = details.get("HI_parents_premium_amount2", "")
-            self.ws["E13"] = details.get("HI_parents_checkup_amount2", "")
-            self.ws["F13"] = details.get("HI_parents_medical_expenditure2", "")
+            self.ws["B13"] = self.data.get("HI_parents_company_name2", "")
+            self.ws["C13"] = self.data.get("HI_parents_policy_number2", "")
+            self.ws["D13"] = self.data.get("HI_parents_premium_amount2", "")
+            self.ws["E13"] = self.data.get("HI_parents_checkup_amount2", "")
+            self.ws["F13"] = self.data.get("HI_parents_medical_expenditure2", "")
 
             # Health Insurance Details for Parents 3rd Company
-            self.ws["B14"] = details.get("HI_parents_company_name3", "")
-            self.ws["C14"] = details.get("HI_parents_policy_number3", "")
-            self.ws["D14"] = details.get("HI_parents_premium_amount3", "")
-            self.ws["E14"] = details.get("HI_parents_checkup_amount3", "")
-            self.ws["F14"] = details.get("HI_parents_medical_expenditure3", "")
+            self.ws["B14"] = self.data.get("HI_parents_company_name3", "")
+            self.ws["C14"] = self.data.get("HI_parents_policy_number3", "")
+            self.ws["D14"] = self.data.get("HI_parents_premium_amount3", "")
+            self.ws["E14"] = self.data.get("HI_parents_checkup_amount3", "")
+            self.ws["F14"] = self.data.get("HI_parents_medical_expenditure3", "")
 
             """################ Donation Sheet ################"""
 
@@ -466,28 +476,161 @@ class ExcelProcessor:
             self._select_worksheet(self.form16, sheet_name="Donation")
 
             # Donation Details for the 1st Donee
-            self.ws["B4"] = details.get("pan_of_donee", "")
-            self.ws["C4"] = details.get("name_of_donee", "")
-            self.ws["D4"] = details.get("address_of_donee", "")
-            self.ws["E4"] = details.get("donation_of_donee", "")
-            self.ws["F4"] = details.get("TRN_of_donee", "")
-            self.ws["G4"] = details.get("IFSC_of_donee", "")
+            self.ws["B4"] = self.data.get("pan_of_donee", "")
+            self.ws["C4"] = self.data.get("name_of_donee", "")
+            self.ws["D4"] = self.data.get("address_of_donee", "")
+            self.ws["E4"] = self.data.get("donation_of_donee", "")
+            self.ws["F4"] = self.data.get("TRN_of_donee", "")
+            self.ws["G4"] = self.data.get("IFSC_of_donee", "")
 
             # Donation Details for the 2nd Donee
-            self.ws["B5"] = details.get("pan_of_donee2", "")
-            self.ws["C5"] = details.get("name_of_donee2", "")
-            self.ws["D5"] = details.get("address_of_donee2", "")
-            self.ws["E5"] = details.get("donation_of_donee2", "")
-            self.ws["F5"] = details.get("TRN_of_donee2", "")
-            self.ws["G5"] = details.get("IFSC_of_donee2", "")
+            self.ws["B5"] = self.data.get("pan_of_donee2", "")
+            self.ws["C5"] = self.data.get("name_of_donee2", "")
+            self.ws["D5"] = self.data.get("address_of_donee2", "")
+            self.ws["E5"] = self.data.get("donation_of_donee2", "")
+            self.ws["F5"] = self.data.get("TRN_of_donee2", "")
+            self.ws["G5"] = self.data.get("IFSC_of_donee2", "")
 
             # Donation Details for the 3rd Donee
-            self.ws["B6"] = details.get("pan_of_donee3", "")
-            self.ws["C6"] = details.get("name_of_donee3", "")
-            self.ws["D6"] = details.get("address_of_donee3", "")
-            self.ws["E6"] = details.get("donation_of_donee3", "")
-            self.ws["F6"] = details.get("TRN_of_donee3", "")
-            self.ws["G6"] = details.get("IFSC_of_donee3", "")
+            self.ws["B6"] = self.data.get("pan_of_donee3", "")
+            self.ws["C6"] = self.data.get("name_of_donee3", "")
+            self.ws["D6"] = self.data.get("address_of_donee3", "")
+            self.ws["E6"] = self.data.get("donation_of_donee3", "")
+            self.ws["F6"] = self.data.get("TRN_of_donee3", "")
+            self.ws["G6"] = self.data.get("IFSC_of_donee3", "")
+
+            """################ Tax Computation Sheet ################"""
+
+            # Load the Tax Computation Sheet
+            # Now the self.ws is already set to the "Tax Computation" sheet ( Tax Computation ),
+            self._select_worksheet(self.form16, sheet_name="Tax Computation")
+
+            self.ws["A3"] = f"Name of Assessee : {self.data.get("Name", "")}"
+            self.ws["A4"] = f"PAN : {self.data.get("PAN Number","")}"
+
+            # Saving the Form-16 workbook
+            self.form16.save(form_16)
+            self.form16.close()
+
+            return True
+        except Exception as e:
+            print(f"Error creating Form-16: {e}")
+            return False
+
+    def _create_form_16_salaried(self, form_16: str) -> bool:
+        """
+        Create Form-16 for Salaried Person
+        """
+
+        try:
+
+            """################ Form-16 Sheet ################"""
+
+            # Load the Form-16 template
+            self._select_form16(form_16, sheet_name="FORM-16")
+
+            self.ws["C72"] = "=MIN(25000, C73+C74+C75)"
+            self.ws["C75"] = 0
+
+            # 80TTA-Interest on deposits in saving bank Accounts
+            # 80TTB- Interest on deposits in case of senior citizens
+            self.ws["D90"] = "=IF(C41>10000,10000,C41)"
+            self.ws["D91"] = 0
+
+            """################ IT Calculation Sheet ################"""  # TODO: UPDATE THIS SHEET
+
+            # Load the IT Calculation Sheet
+            # Now the self.ws is already set to the "IT Calculation" sheet,
+            self._select_worksheet(self.form16, sheet_name="IT Calculation")
+
+            self.ws["A1"] = "Tax Comparison (Salaried Person)"
+
+            # Old Tax Regime
+            # Slabs
+            self.ws["A6"] = "0 to 250000"
+            self.ws["A7"] = "250000 to 500000"
+            self.ws["A9"] = "500000 to 1000000"
+            self.ws["A11"] = ">1000000"
+
+            # Rates
+            self.ws["B6"] = 0.0
+            self.ws["B7"] = 0.05
+            self.ws["B9"] = 0.20
+            self.ws["B11"] = 0.30
+
+            # Tax
+            self.ws["C6"] = "=IF(C4>250000, 250000*B6, C4*B6)"
+            self.ws["C7"] = (
+                "=IF(C4>500000, 250000*B7, IF(C4>250000, (C4-250000)*B7, 0))"
+            )
+            self.ws["C9"] = (
+                "=IF(C4>1000000, 500000*B9, IF(C4>500000, (C4-500000)*B9, 0))"
+            )
+            self.ws["C11"] = "=IF(C4>1000000, (C4-1000000)*B11, 0)"
+
+            self.ws["C18"] = self.data.get("TDS/Tax Deducted", "")[0]
+
+            # Saving the Form-16 workbook
+            self.form16.save(form_16)
+            self.form16.close()
+
+            return True
+        except Exception as e:
+            print(f"Error creating Form-16: {e}")
+            return False
+
+    def _create_form_16_retired(self, form_16: str) -> bool:
+        """
+        Create Form-16 for Salaried Person
+        """
+
+        try:
+
+            """################ Form-16 Sheet ################"""
+
+            # Load the Form-16 template
+            self._select_form16(form_16, sheet_name="FORM-16")
+
+            self.ws["C72"] = "=MIN(50000, C73+C74+C75)"
+            self.ws["C75"] = "=HI!F7"
+
+            # 80TTA-Interest on deposits in saving bank Accounts
+            # 80TTB- Interest on deposits in case of senior citizens
+            self.ws["D90"] = 0
+            self.ws["D91"] = "=IF(C41+C42>50000,50000,C41+C42)"
+
+            """################ IT Calculation Sheet ################"""  # TODO: UPDATE THIS SHEET
+
+            # Load the IT Calculation Sheet
+            # Now the self.ws is already set to the "IT Calculation" sheet,
+            self._select_worksheet(self.form16, sheet_name="IT Calculation")
+
+            self.ws["A1"] = "Tax Comparison (Retired Person)"
+
+            # Old Tax Regime
+            # Slabs
+            self.ws["A6"] = "0 to 300000"
+            self.ws["A7"] = "300000 to 500000"
+            self.ws["A9"] = "500000 to 1000000"
+            self.ws["A11"] = ">1000000"
+
+            # Rates
+            self.ws["B6"] = 0.0
+            self.ws["B7"] = 0.05
+            self.ws["B9"] = 0.20
+            self.ws["B11"] = 0.30
+
+            # Rates
+            self.ws["C6"] = "=IF(C4>300000, 300000*B6, C4*B6)"
+            self.ws["C7"] = (
+                "=IF(C4>500000, 200000*B7, IF(C4>300000, (C4-300000)*B7, 0))"
+            )
+            self.ws["C9"] = (
+                "=IF(C4>1000000, 500000*B8, IF(C4>500000, (C4-500000)*B8, 0))"
+            )
+            self.ws["C11"] = "=IF(C4>1000000, (C4-1000000)*B9, 0)"
+
+            self.ws["C18"] = self.data.get("TDS/Tax Deducted", "")[0]
 
             # Saving the Form-16 workbook
             self.form16.save(form_16)
