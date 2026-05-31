@@ -8,7 +8,7 @@ import os
 class MainView:
     def __init__(self, page: ft.Page):
         self.page = page
-        self.excel_processor = ExcelProcessor(True)
+        self.is_retired = False
         self.selected_files = ""
         self.output_path = ""
         self.file_path = ""
@@ -22,6 +22,12 @@ class MainView:
         )
 
         self.status_text = ft.Text("", color=ColorScheme.TEXT_SECONDARY, size=14)
+
+        self.retired_toggle = ft.Switch(
+            label="Retired Employee",
+            label_position=ft.LabelPosition.RIGHT,
+            on_change=self.on_retired_toggle_changed,
+        )
 
     async def pick_file(self, e: ft.Event[ft.Button]):
         files = await ft.FilePicker().pick_files(
@@ -69,7 +75,8 @@ class MainView:
             self.show_status("Processing File...", ColorScheme.PRIMARY)
 
             # Call the ExcelProcessor to create Form-16
-            create_Excel = self.excel_processor.create_form_16(
+            excel_processor = ExcelProcessor(self.is_retired)
+            create_Excel = excel_processor.create_form_16(
                 itr_format=self.file_path or "",
                 form_16=self.output_path,
             )
@@ -85,6 +92,10 @@ class MainView:
         self.status_text.value = message
         self.status_text.color = color
         self.status_text.weight = ft.FontWeight.BOLD
+        self.page.update()
+
+    def on_retired_toggle_changed(self, e):
+        self.is_retired = e.control.value
         self.page.update()
 
     def build(self):
@@ -139,7 +150,11 @@ class MainView:
                                                         weight=ft.FontWeight.BOLD,
                                                     )
                                                 ),
-                                            )
+                                            ),
+                                            ft.Container(
+                                                content=self.retired_toggle,
+                                                margin=ft.Margin(left=20),
+                                            ),
                                         ]
                                     ),
                                     margin=ft.Margin(top=5, bottom=10),
@@ -147,7 +162,7 @@ class MainView:
                                 self.selected_file_text,
                             ]
                         ),
-                        padding=20,  # all(1, ColorScheme.BORDER)
+                        padding=20,
                         border=ft.Border.all(1, ColorScheme.BORDER),
                         border_radius=8,
                         bgcolor=ColorScheme.SURFACE,
