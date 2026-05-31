@@ -6,6 +6,10 @@ import openpyxl
 
 @dataclass
 class ExcelProcessor:
+
+    def __init__(self, is_retired: bool = False):
+        self.is_retired = is_retired
+
     def _select_form16(self, file_name: str, sheet_name: str = "FORM-16") -> None:
         """
         Opens an existing Excel workbook for Form-16 using openpyxl and selects the specified worksheet.
@@ -246,25 +250,25 @@ class ExcelProcessor:
         self.data["pan_of_donee"] = df.iat[3, 1]
         self.data["name_of_donee"] = df.iat[3, 2]
         self.data["address_of_donee"] = df.iat[3, 3]
-        self.data["TRN_of_donee"] = df.iat[3, 4]
-        self.data["IFSC_of_donee"] = df.iat[3, 5]
-        self.data["donation_of_donee"] = df.iat[3, 6]
+        self.data["donation_of_donee"] = df.iat[3, 4]
+        self.data["TRN_of_donee"] = df.iat[3, 5]
+        self.data["IFSC_of_donee"] = df.iat[3, 6]
 
         # Donation Details 2nd Organization
         self.data["pan_of_donee2"] = df.iat[4, 1]
         self.data["name_of_donee2"] = df.iat[4, 2]
         self.data["address_of_donee2"] = df.iat[4, 3]
-        self.data["TRN_of_donee2"] = df.iat[4, 4]
-        self.data["IFSC_of_donee2"] = df.iat[4, 5]
-        self.data["donation_of_donee2"] = df.iat[4, 6]
+        self.data["donation_of_donee2"] = df.iat[4, 4]
+        self.data["TRN_of_donee2"] = df.iat[4, 5]
+        self.data["IFSC_of_donee2"] = df.iat[4, 6]
 
         # Donation Details 3rd Organization
         self.data["pan_of_donee3"] = df.iat[5, 1]
         self.data["name_of_donee3"] = df.iat[5, 2]
         self.data["address_of_donee3"] = df.iat[5, 3]
-        self.data["TRN_of_donee3"] = df.iat[5, 4]
-        self.data["IFSC_of_donee3"] = df.iat[5, 5]
-        self.data["donation_of_donee3"] = df.iat[5, 6]
+        self.data["donation_of_donee3"] = df.iat[5, 4]
+        self.data["TRN_of_donee3"] = df.iat[5, 5]
+        self.data["IFSC_of_donee3"] = df.iat[5, 6]
 
         print("\033[1;32m\tDetails extracted successfully:\033[0m\n")
 
@@ -283,7 +287,7 @@ class ExcelProcessor:
             # Extract details from the ITR format file
             details = self._extract_details(itr_format)
 
-            """################ Form-16 Sheet ################"""
+            """################ Form-16 Sheet ################"""  # TODO: UPDATE FORM 16 ENTRIES
             # Load the Form-16 template
             self._select_form16(form_16, sheet_name="FORM-16")
 
@@ -296,14 +300,14 @@ class ExcelProcessor:
 
             """################ Income from Other Sources ################"""
 
-            self.ws["C38"] = details.get("Interest on Saving A/c", "")[0]
-            self.ws["C39"] = details.get("Interest on FD/RD/MIS", "")[0]
+            self.ws["C41"] = details.get("Interest on Saving A/c", "")[0]
+            self.ws["C42"] = details.get("Interest on FD/RD/MIS", "")[0]
 
             """################ Deductions under 80C ################"""
 
-            self.ws["C47"] = details.get("NPS (Employee Share)", "")[0]
-            self.ws["F44"] = details.get("NPS PRAN No. (NPS Employee)", "")
-            self.ws["F48"] = details.get("PF A/c No. (GPF/EPF Employee)", "")
+            self.ws["C50"] = details.get("NPS (Employee Share)", "")[0]
+            self.ws["F50"] = details.get("NPS PRAN No. (NPS Employee)", "")
+            self.ws["F51"] = details.get("PF A/c No. (GPF/EPF Employee)", "")
 
             fields = [
                 "Life Insurance Premium",
@@ -320,8 +324,8 @@ class ExcelProcessor:
                 "Home Loan Principal",
             ]
             for i, field in enumerate(fields):
-                saving_name = f"C{52 + i}"
-                document_number = f"F{52 + i}"
+                saving_name = f"C{55 + i}"
+                document_number = f"F{55 + i}"
 
                 self.ws[saving_name] = details.get(field, "")[0]
                 self.ws[document_number] = details.get(field, "")[1]
@@ -329,36 +333,15 @@ class ExcelProcessor:
             """################ 80CCD(1B) -NPS Employee Contribution ################"""
 
             # NPS PRAN No. (NPS Employee)
-            self.ws["F47"] = details.get("NPS PRAN No. (NPS Employee)", "")
-            self.ws["F66"] = details.get("NPS PRAN No. (NPS Employee)", "")
+            self.ws["F69"] = details.get("NPS PRAN No. (NPS Employee)", "")
 
-            """################ 80D - Deductions for Medical Expenses ################"""
-
-            # Preventive Health Checkup Expenses for Employee and Family
-            phc_self = details.get("Health Checkup Exp (Employee & family)", "")[0]
-
-            if not isnan(phc_self):
-                self.ws["C68"] = phc_self if ((phc_self <= 5000)) else 5000
-            else:
-                self.ws["C68"] = 0
-
-            # Preventive Health Checkup Expenses for Parents
-            phc_parents = details.get(
-                "Medical Exp (If Parents are Senior Citizen)", ""
-            )[0]
-
-            if not isnan(phc_parents):
-                self.ws["C73"] = phc_parents if (phc_parents <= 50000) else 50000
-            else:
-                self.ws["C73"] = 0
-
-            """################ IT Calculation Sheet ################"""
+            """################ IT Calculation Sheet ################"""  # TODO: UPDATE THIS SHEET
 
             # Load the IT Calculation Sheet
             # Now the self.ws is already set to the "IT Calculation" sheet,
             self._select_worksheet(self.form16, sheet_name="IT Calculation")
 
-            self.ws["C17"] = details.get("TDS/Tax Deducted", "")[0]
+            self.ws["C18"] = details.get("TDS/Tax Deducted", "")[0]
 
             """################ HRA Sheet ################"""
 
@@ -486,25 +469,25 @@ class ExcelProcessor:
             self.ws["B4"] = details.get("pan_of_donee", "")
             self.ws["C4"] = details.get("name_of_donee", "")
             self.ws["D4"] = details.get("address_of_donee", "")
-            self.ws["E4"] = details.get("TRN_of_donee", "")
-            self.ws["F4"] = details.get("IFSC_of_donee", "")
-            self.ws["G4"] = details.get("donation_of_donee", "")
+            self.ws["E4"] = details.get("donation_of_donee", "")
+            self.ws["F4"] = details.get("TRN_of_donee", "")
+            self.ws["G4"] = details.get("IFSC_of_donee", "")
 
             # Donation Details for the 2nd Donee
             self.ws["B5"] = details.get("pan_of_donee2", "")
             self.ws["C5"] = details.get("name_of_donee2", "")
             self.ws["D5"] = details.get("address_of_donee2", "")
-            self.ws["E5"] = details.get("TRN_of_donee2", "")
-            self.ws["F5"] = details.get("IFSC_of_donee2", "")
-            self.ws["G5"] = details.get("donation_of_donee2", "")
+            self.ws["E5"] = details.get("donation_of_donee2", "")
+            self.ws["F5"] = details.get("TRN_of_donee2", "")
+            self.ws["G5"] = details.get("IFSC_of_donee2", "")
 
             # Donation Details for the 3rd Donee
             self.ws["B6"] = details.get("pan_of_donee3", "")
             self.ws["C6"] = details.get("name_of_donee3", "")
             self.ws["D6"] = details.get("address_of_donee3", "")
-            self.ws["E6"] = details.get("TRN_of_donee3", "")
-            self.ws["F6"] = details.get("IFSC_of_donee3", "")
-            self.ws["G6"] = details.get("donation_of_donee3", "")
+            self.ws["E6"] = details.get("donation_of_donee3", "")
+            self.ws["F6"] = details.get("TRN_of_donee3", "")
+            self.ws["G6"] = details.get("IFSC_of_donee3", "")
 
             # Saving the Form-16 workbook
             self.form16.save(form_16)

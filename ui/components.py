@@ -4,10 +4,11 @@ from scripts import ExcelProcessor  # type: ignore
 import os
 
 
+# TODO Create a Toggle button for Retired Emp.
 class MainView:
     def __init__(self, page: ft.Page):
         self.page = page
-        self.excel_processor = ExcelProcessor()
+        self.excel_processor = ExcelProcessor(True)
         self.selected_files = ""
         self.output_path = ""
         self.file_path = ""
