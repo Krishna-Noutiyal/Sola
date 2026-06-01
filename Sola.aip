@@ -5673,7 +5673,7 @@
     <ROW Property="AI_SHORTCUTSREG" Registry="AI_SHORTCUTSREG" HklmSearch="AI_SHORTCUTSREG" HkcuSearch="AI_SHORTCUTSREG_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
-    <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="6" UpdatesUrl="https://github.com/Krishna-Noutiyal/Sola/updates.txt"/>
+    <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="6" UpdatesUrl="https://raw.githubusercontent.com/Krishna-Noutiyal/Sola/refs/heads/main/updates.txt"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrapperUISequenceComponent">
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="249"/>
@@ -6348,7 +6348,7 @@
     <ROW IniFile="DownloadsFolder" FileName="SOLAUP~1.INI|Sola Updater.ini" DirProperty="APPDIR" Section="General" Key="DownloadsFolder" Value="[CommonAppDataFolder][Manufacturer]\[ProductName]\updates\" Action="0" Component_="updater.exe"/>
     <ROW IniFile="Flags" FileName="SOLAUP~1.INI|Sola Updater.ini" DirProperty="APPDIR" Section="General" Key="Flags" Value="PerMachine|ShowConfigOptionsButton|GitHubUpdates" Action="0" Component_="updater.exe"/>
     <ROW IniFile="ID" FileName="SOLAUP~1.INI|Sola Updater.ini" DirProperty="APPDIR" Section="General" Key="ID" Value="[UpgradeCode]" Action="0" Component_="updater.exe"/>
-    <ROW IniFile="URL" FileName="SOLAUP~1.INI|Sola Updater.ini" DirProperty="APPDIR" Section="General" Key="URL" Value="https://github.com/Krishna-Noutiyal/Sola/updates.txt" Action="0" Component_="updater.exe"/>
+    <ROW IniFile="URL" FileName="SOLAUP~1.INI|Sola Updater.ini" DirProperty="APPDIR" Section="General" Key="URL" Value="https://raw.githubusercontent.com/Krishna-Noutiyal/Sola/refs/heads/main/updates.txt" Action="0" Component_="updater.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
@@ -6428,7 +6428,7 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
     <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
     <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
-    <ROW UpgradeCode="{0468B821-8AD9-46E7-8BB5-65FBE3955791}" VersionMin="1.3.2" VersionMax="3.0" Language="1033" Attributes="517" ActionProperty="UPGRADE_1"/>
+    <ROW UpgradeCode="{0468B821-8AD9-46E7-8BB5-65FBE3955791}" VersionMin="1.0" VersionMax="3.1.1" Language="1033" Attributes="261" ActionProperty="UPGRADE_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SoftwareIdentificationComponent">
     <ATTRIBUTE name="LocalFile" value="regid.199509.com.example_ProductNam"/>
