@@ -9,7 +9,7 @@ class MainView:
     def __init__(self, page: ft.Page):
         self.page = page
         self.is_retired = False
-        self.selected_files = ""
+        self.selected_file = ""
         self.output_path = ""
         self.file_path = ""
 
