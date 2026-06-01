@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" CreateVersion="22.4" version="22.4" Modules="update" RootPath="." Language="sq" Id="{F91C4EFB-A3AB-42BB-BFBD-513968559D05}">
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;AI_DICTS&gt;aiu-ue.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.UpdaterEditorComponent">
+    <ROW Section="Sola v3.1.1" Key="Name" Value="Sola v3.1.1"/>
+    <ROW Section="Sola v3.1.1" Key="ProductVersion" Value="3.1.1.0" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="URL" Value="https://github.com/Krishna-Noutiyal/Sola/releases/download/v3.1.1/Sola.v3.1.1.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="Size" Value="release\Sola v3.1.1.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="ReleaseDate" Value="23745" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="SHA256" Value="release\Sola v3.1.1.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="MD5" Value="release\Sola v3.1.1.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="ServerFileName" Value="Sola v3.1.1.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="Flags" Value="Critical" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="RegistryKey" Value="HKUD\Software\Krish\Sola\Version" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="Version" Value="3.1.1.0" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="UpdatedApplications" Value="Sola[1.0-3.1.1)" ValueLocId="-"/>
+    <ROW Section="Sola v3.1.1" Key="Description" Value="The latest update introduces comprehensive support for the ITR-Format (2026) and Form-16 (2026), enhancing compatibility and ensuring seamless integration with the updated standards."/>
+    <ROW Section="Sola v3.1.1" Key="AutoCloseApplication" Value="[APPDIR]Sola.exe|;;NoRestart" ValueLocId="-"/>
+    <ATTRIBUTE name="OutputFileName" value="updates.txt"/>
+    <ATTRIBUTE name="OutputFolder" value="."/>
+  </COMPONENT>
+</DOCUMENT>

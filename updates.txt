@@ -1,0 +1,17 @@
+;aiu;
+
+[Sola v3.1.1]
+Name = Sola v3.1.1
+ProductVersion = 3.1.1.0
+URL = https://github.com/Krishna-Noutiyal/Sola/releases/download/v3.1.1/Sola.v3.1.1.exe
+Size = 103508896
+ReleaseDate = 01/06/2026
+SHA256 = 35762CF72037D472600552A4B60A4317794E80C70BCC020A62FF8788DB3DAD0A
+MD5 = 3f75efe0964c406c1207a284e3c791c3
+ServerFileName = Sola v3.1.1.exe
+Flags = Critical
+RegistryKey = HKUD\Software\Krish\Sola\Version
+Version = 3.1.1.0
+UpdatedApplications = Sola[1.0-3.1.1)
+Description = The latest update introduces comprehensive support for the ITR-Format (2026) and Form-16 (2026), enhancing compatibility and ensuring seamless integration with the updated standards.
+AutoCloseApplication = [APPDIR]Sola.exe|;;NoRestart
