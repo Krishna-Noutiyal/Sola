@@ -44,11 +44,8 @@ To build the application from scratch for Windows, run the following command:
 > You can type `git -v` directly into your console; if no error is shown, `git` is installed on your system.
 
 ```powershell
-git clone --no-checkout https://github.com/Krishna-Noutiyal/ITR-Kit.git
-cd ITR-Kit
-git sparse-checkout init
-git sparse-checkout set capital_gain_calculator
-git checkout main
+git clone --no-checkout https://github.com/Krishna-Noutiyal/Sola.git
+cd Sola
 ```
 
 Head to the form-16_generator folder and run the build command:
