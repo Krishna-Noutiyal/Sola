@@ -104,6 +104,10 @@ class ExcelProcessor:
             Populates self.data with the extracted information.
         """
 
+        # Returns the Extracted Data if already extracted before.
+        if self.data:
+            return self.data
+
         print("\033[1;37m\033[1mStarting extraction...\033[0m\n")
         df = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
         # Extract key-value pairs from B5:C20 (Excel is 1-indexed, pandas is 0-indexed)
@@ -123,6 +127,19 @@ class ExcelProcessor:
         # D13 is row 12 (0-indexed), column 3 (0-indexed)
         # This password is created by the employee of Pooja ITR
         self.data["new_passwd"] = df.iat[12, 3]
+
+        # Simplify Date of Birth to a datetime object
+        dob_key = "Date of Birth (DD/MM/YYYY)"
+        dob_value = self.data.get(dob_key)
+        if isinstance(dob_value, str) and dob_value.strip():
+            try:
+                self.data["dob"] = pd.to_datetime(
+                    dob_value, format="%d/%m/%Y", dayfirst=True
+                )
+            except ValueError:
+                self.data["dob"] = pd.to_datetime(
+                    dob_value, dayfirst=True, errors="coerce"
+                )
 
         """ ################## Extracting Home Loan Details ################## """
 
@@ -642,11 +659,16 @@ class ExcelProcessor:
             return False
 
 
-# if __name__ == "__main__":
-#     # Create an instance of CSVProcessor
-#     test = ExcelProcessor()
+if __name__ == "__main__":
+    # Create an instance of CSVProcessor
+    test = ExcelProcessor()
 
-#     test.create_form_16(
-#         itr_format="form-16_generator/test/ITR Format (PIC).xlsx",
-#         form_16="form-16_generator/test/Form-16.xlsx",
-#     )
+    # test.create_form_16(
+    #     itr_format="form-16_generator/test/ITR Format (PIC).xlsx",
+    #     form_16="form-16_generator/test/Form-16.xlsx",
+    # )
+    test._extract_details(r"test\retired\Retd ITR Format.xlsx")
+    test._extract_details(r"test\retired\Retd ITR Format.xlsx")
+
+    print(f"Dob : {test.data["dob"]}")
+    print(f"The Type is {type(test.data["dob"])}")
