@@ -20,6 +20,9 @@ class Router:
         project = data.get("project", {})
         name = project.get("name", "")
         version = project.get("version", "")
+        # Strip patch version (e.g., "3.1.0" -> "3.1")
+        version_parts = version.split(".")[:2]
+        version = ".".join(version_parts)
 
         self.page.title = f"{name} v{version}"
         self.page.theme_mode = ft.ThemeMode.DARK
