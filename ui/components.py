@@ -164,7 +164,7 @@ class MainView:
                         content=ft.Row(
                             [
                                 ft.Image(
-                                    src="icons/icon_V4.png",
+                                    src=r"assets\icon.png",
                                     width=48,
                                     height=48,
                                     fit=ft.BoxFit.CONTAIN,
