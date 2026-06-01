@@ -3,13 +3,14 @@ from config import ColorScheme
 from scripts import ExcelProcessor  # type: ignore
 import os
 import asyncio
+import pandas as pd
 
 
-# TODO Create a Toggle button for Retired Emp.
 class MainView:
     def __init__(self, page: ft.Page):
         self.page = page
         self.is_retired = False
+        self.auto_detect_enabled = True  # Default enabled
         self.selected_file = ""
         self.output_path = ""
         self.file_path = ""
@@ -30,6 +31,13 @@ class MainView:
             color=ColorScheme.PRIMARY,
             bgcolor=ColorScheme.SURFACE,
             visible=False,
+        )
+
+        self.auto_detect_toggle = ft.Switch(
+            label="Auto-Detect Age",
+            label_position=ft.LabelPosition.RIGHT,
+            value=self.auto_detect_enabled,
+            on_change=self.on_auto_detect_toggle_changed,
         )
 
         self.retired_toggle = ft.Switch(
@@ -62,6 +70,9 @@ class MainView:
             file_name = self.selected_file.name
             self.selected_file_text.value = f"📄 ITR Format: {file_name}"
             self.selected_file_text.color = ColorScheme.SUCCESS
+
+            # Extract details and auto-detect retirement if enabled
+            await self._extract_and_auto_detect()
         else:
             self.selected_files = ""
             self.file_path = ""
@@ -69,6 +80,18 @@ class MainView:
             self.selected_file_text.color = ColorScheme.TEXT_SECONDARY
         self._update_submit_button()
         self.page.update()
+
+    async def _extract_and_auto_detect(self):
+        """Extract details from selected file and auto-detect retirement status."""
+        if not self.file_path:
+            return
+        try:
+            excel_processor = ExcelProcessor(is_retired=False)
+            excel_processor._extract_details(self.file_path)
+            dob = excel_processor.data.get("dob")
+            self._auto_detect_retirement(dob)
+        except Exception:
+            pass  # Silently fail and let user manually set retired status
 
     async def pick_output(self, e: ft.Event[ft.Button]):
         file_path = await ft.FilePicker().save_file(
@@ -155,6 +178,57 @@ class MainView:
         self.is_retired = e.control.value
         self.page.update()
 
+    def on_auto_detect_toggle_changed(self, e):
+        self.auto_detect_enabled = e.control.value
+        # Save state to persistent client storage
+        self.page.run_task(self._save_auto_detect_state)
+        self.page.update()
+
+    async def _save_auto_detect_state(self):
+        """Save auto_detect state to persistent client storage."""
+        await self.page.shared_preferences.set(f"auto_detect", self.auto_detect_enabled)
+
+    async def _load_auto_detect_state(self):
+        """Load auto_detect state from persistent client storage."""
+        try:
+            value = await self.page.shared_preferences.get(f"auto_detect")
+            if value is not None:
+                self.auto_detect_enabled = bool(value)
+                self.auto_detect_toggle.value = bool(value)
+        except Exception:
+            pass  # Use default if error
+
+    def load_settings(self):
+        """Public method to load settings - call from main.py after page is ready."""
+        self.page.run_task(self._load_auto_detect_state)
+
+    def _auto_detect_retirement(self, dob):
+        """Auto-detect if person is > 60 years old based on DOB."""
+        if dob is None:
+            return
+        try:
+            today = pd.Timestamp.today()
+            age = (today - dob).days / 365.25
+            file_name = (
+                os.path.basename(self.file_path) if self.file_path else "Unknown"
+            )
+            if self.auto_detect_enabled:
+                if age >= 60:
+                    self.retired_toggle.value = True
+                    self.is_retired = True
+                    self.selected_file_text.value = f"📄 ITR Format: {file_name} (Age: {int(age)} years - Retired ✨)"
+                    self.selected_file_text.color = ft.Colors.ORANGE
+                else:
+                    self.retired_toggle.value = False
+                    self.is_retired = False
+                    self.selected_file_text.value = (
+                        f"📄 ITR Format: {file_name} (Age: {int(age)} years)"
+                    )
+                    self.selected_file_text.color = ColorScheme.SUCCESS
+                self.page.update()
+        except Exception:
+            pass
+
     def build(self):
         return ft.Container(
             content=ft.Column(
@@ -229,7 +303,16 @@ class MainView:
                                                 ),
                                             ),
                                             ft.Container(
-                                                content=self.retired_toggle,
+                                                content=ft.Row(
+                                                    [
+                                                        self.auto_detect_toggle,
+                                                        ft.Container(
+                                                            content=self.retired_toggle,
+                                                            margin=ft.Margin(left=10),
+                                                        ),
+                                                    ],
+                                                    spacing=5,
+                                                ),
                                                 margin=ft.Margin(left=20),
                                             ),
                                         ]

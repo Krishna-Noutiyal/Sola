@@ -34,4 +34,5 @@ class Router:
     def setup_main_route(self):
         main_view = MainView(self.page)
         self.page.add(main_view.build())
+        main_view.load_settings()
         self.page.update()
