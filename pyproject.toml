@@ -1,6 +1,6 @@
 [project]
 name = "Sola"
-version = "2.1"
+version = "3.0"
 description = "A Form-16 Filler, that fills Form-16 using ITR-Format."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -14,4 +14,4 @@ dependencies = [
 [tool.flet]
 product = "Sola"
 company = "Pooja ITR Center"
-copyright = "Copyright (C) 2025 Pooja ITR Center"
+copyright = "Copyright (C) 2026 Pooja ITR Center"

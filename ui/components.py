@@ -2,6 +2,7 @@ import flet as ft
 from config import ColorScheme
 from scripts import ExcelProcessor  # type: ignore
 import os
+import asyncio
 
 
 # TODO Create a Toggle button for Retired Emp.
@@ -12,6 +13,7 @@ class MainView:
         self.selected_file = ""
         self.output_path = ""
         self.file_path = ""
+        self.is_processing = False
 
         self.selected_file_text = ft.Text(
             "No File Selected", color=ColorScheme.TEXT_SECONDARY, size=14
@@ -23,10 +25,30 @@ class MainView:
 
         self.status_text = ft.Text("", color=ColorScheme.TEXT_SECONDARY, size=14)
 
+        self.progress_bar = ft.ProgressBar(
+            width=300,
+            color=ColorScheme.PRIMARY,
+            bgcolor=ColorScheme.SURFACE,
+            visible=False,
+        )
+
         self.retired_toggle = ft.Switch(
             label="Retired Employee",
             label_position=ft.LabelPosition.RIGHT,
             on_change=self.on_retired_toggle_changed,
+        )
+
+        self.submit_button = ft.ElevatedButton(
+            "Submit",
+            icon=ft.Icons.PLAY_ARROW,
+            on_click=self.on_submit_clicked,
+            bgcolor=ColorScheme.SUCCESS,
+            color=ft.Colors.WHITE,
+            width=200,
+            height=50,
+            style=ft.ButtonStyle(
+                text_style=ft.TextStyle(size=16, weight=ft.FontWeight.BOLD)
+            ),
         )
 
     async def pick_file(self, e: ft.Event[ft.Button]):
@@ -38,13 +60,14 @@ class MainView:
             self.selected_file = files[0]
             self.file_path = self.selected_file.path
             file_name = self.selected_file.name
-            self.selected_file_text.value = f"ITR Format: {file_name}"
+            self.selected_file_text.value = f"📄 ITR Format: {file_name}"
             self.selected_file_text.color = ColorScheme.SUCCESS
         else:
             self.selected_files = ""
             self.file_path = ""
             self.selected_file_text.value = "No File Selected"
             self.selected_file_text.color = ColorScheme.TEXT_SECONDARY
+        self._update_submit_button()
         self.page.update()
 
     async def pick_output(self, e: ft.Event[ft.Button]):
@@ -54,25 +77,47 @@ class MainView:
         )
         if file_path:
             self.output_path = file_path
-            self.output_path_text.value = f"Form-16: {os.path.basename(file_path)}"
+            self.output_path_text.value = f"📁 Form-16: {os.path.basename(file_path)}"
             self.output_path_text.color = ColorScheme.SUCCESS
         else:
             self.output_path = ""
             self.output_path_text.value = "No Form-16 Selected"
             self.output_path_text.color = ColorScheme.TEXT_SECONDARY
+        self._update_submit_button()
         self.page.update()
 
-    def on_submit_clicked(self, e):
+    def _update_submit_button(self):
+        has_file = bool(self.selected_file)
+        has_output = bool(self.output_path)
+        self.submit_button.disabled = not (has_file and has_output)
+        if not has_file and not has_output:
+            self.submit_button.bgcolor = ColorScheme.SURFACE
+        else:
+            self.submit_button.bgcolor = ColorScheme.SUCCESS
+
+    async def on_submit_clicked(self, e):
         if not self.selected_file:
-            self.show_status("Please Select ITR Format !", ColorScheme.ERROR)
+            self.show_status("⚠️ Please Select ITR Format !", ColorScheme.ERROR)
             return
 
         if not self.output_path:
-            self.show_status("Please Select Form-16 !", ColorScheme.ERROR)
+            self.show_status("⚠️ Please Select Form-16 !", ColorScheme.ERROR)
+            return
+
+        if self.is_processing:
             return
 
         try:
-            self.show_status("Processing File...", ColorScheme.PRIMARY)
+            self.is_processing = True
+            self.submit_button.disabled = True
+            self.submit_button.content = "Processing..."
+            self.submit_button.bgcolor = ColorScheme.PRIMARY
+            self.progress_bar.visible = True
+            self.show_status("⏳ Processing File...", ColorScheme.PRIMARY)
+            self.page.update()
+
+            # Ensure minimum processing time for UX feedback
+            await asyncio.sleep(0.5)
 
             # Call the ExcelProcessor to create Form-16
             excel_processor = ExcelProcessor(self.is_retired)
@@ -81,12 +126,24 @@ class MainView:
                 form_16=self.output_path,
             )
 
+            self.is_processing = False
+            self.progress_bar.visible = False
+
             if create_Excel:
-                self.show_status("Form-16 Filled Successfully !", ColorScheme.SUCCESS)
+                self.show_status(
+                    "✅ Form-16 Filled Successfully !", ColorScheme.SUCCESS
+                )
             else:
-                self.show_status("Error Processing File !", ColorScheme.ERROR)
+                self.show_status("❌ Error Processing File !", ColorScheme.ERROR)
         except Exception as ex:
-            self.show_status(f"Error: {str(ex)}", ColorScheme.ERROR)
+            self.is_processing = False
+            self.progress_bar.visible = False
+            self.show_status(f"❌ Error: {str(ex)}", ColorScheme.ERROR)
+        finally:
+            self.submit_button.disabled = False
+            self.submit_button.content = "Submit"
+            self._update_submit_button()
+            self.page.update()
 
     def show_status(self, message: str, color: str):
         self.status_text.value = message
@@ -100,26 +157,36 @@ class MainView:
 
     def build(self):
         return ft.Container(
-            # width= self.page.width,
-            # height= self.page.height,
             content=ft.Column(
                 [
                     # Title
                     ft.Container(
-                        content=ft.Text(
-                            "Sola : Form-16 Generator",
-                            size=32,
-                            weight=ft.FontWeight.BOLD,
-                            color=ColorScheme.PRIMARY,
+                        content=ft.Row(
+                            [
+                                ft.Image(
+                                    src="icons/icon_V4.png",
+                                    width=48,
+                                    height=48,
+                                    fit=ft.BoxFit.CONTAIN,
+                                ),
+                                ft.Text(
+                                    "Sola : Form-16 Generator",
+                                    size=32,
+                                    weight=ft.FontWeight.BOLD,
+                                    color=ColorScheme.PRIMARY,
+                                ),
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
                         ),
-                        margin=ft.Margin(bottom=30),
+                        margin=ft.Margin(bottom=20),
                     ),
                     # Description
                     ft.Container(
                         content=ft.Text(
-                            "Hello, Sola is a Form-16 Filler, Use the ITR format of user to fill the desired Form-16 (xlsx) file of the respective user.\n",
+                            "Fill Form-16 using ITR format data of the employee",
                             size=16,
                             color=ColorScheme.TEXT_SECONDARY,
+                            text_align=ft.TextAlign.CENTER,
                         ),
                         margin=ft.Margin(bottom=30),
                     ),
@@ -127,11 +194,21 @@ class MainView:
                     ft.Container(
                         content=ft.Column(
                             [
-                                ft.Text(
-                                    "Select ITR Format:",
-                                    size=18,
-                                    weight=ft.FontWeight.W_500,
-                                    color=ColorScheme.TEXT_PRIMARY,
+                                ft.Row(
+                                    [
+                                        ft.Icon(
+                                            ft.Icons.DESCRIPTION,
+                                            size=20,
+                                            color=ColorScheme.TEXT_SECONDARY,
+                                        ),
+                                        ft.Text(
+                                            "Select ITR Format:",
+                                            size=18,
+                                            weight=ft.FontWeight.W_500,
+                                            color=ColorScheme.TEXT_PRIMARY,
+                                        ),
+                                    ],
+                                    spacing=10,
                                 ),
                                 ft.Container(
                                     content=ft.Row(
@@ -168,15 +245,25 @@ class MainView:
                         bgcolor=ColorScheme.SURFACE,
                         margin=ft.Margin(bottom=20),
                     ),
-                    # Select Form-15 Selection Section
+                    # Select Form-16 Selection Section
                     ft.Container(
                         content=ft.Column(
                             [
-                                ft.Text(
-                                    "Select Form-16:",
-                                    size=18,
-                                    weight=ft.FontWeight.W_500,
-                                    color=ColorScheme.TEXT_PRIMARY,
+                                ft.Row(
+                                    [
+                                        ft.Icon(
+                                            ft.Icons.SAVE,
+                                            size=20,
+                                            color=ColorScheme.TEXT_SECONDARY,
+                                        ),
+                                        ft.Text(
+                                            "Select Form-16:",
+                                            size=18,
+                                            weight=ft.FontWeight.W_500,
+                                            color=ColorScheme.TEXT_PRIMARY,
+                                        ),
+                                    ],
+                                    spacing=10,
                                 ),
                                 ft.Container(
                                     content=ft.Row(
@@ -209,31 +296,26 @@ class MainView:
                         bgcolor=ColorScheme.SURFACE,
                         margin=ft.Margin(bottom=30),
                     ),
+                    # Progress Bar
+                    ft.Container(
+                        content=self.progress_bar,
+                        alignment=ft.Alignment.CENTER,
+                        margin=ft.Margin(bottom=15),
+                    ),
                     # Submit Button
                     ft.Container(
-                        content=ft.ElevatedButton(
-                            "Submit",
-                            icon=ft.Icons.PLAY_ARROW,
-                            on_click=self.on_submit_clicked,
-                            bgcolor=ColorScheme.SUCCESS,
-                            color=ft.Colors.WHITE,
-                            width=200,
-                            height=50,
-                            style=ft.ButtonStyle(
-                                text_style=ft.TextStyle(
-                                    size=16, weight=ft.FontWeight.BOLD
-                                )  # Increased text size
-                            ),
-                        ),
+                        content=self.submit_button,
                         alignment=ft.Alignment.CENTER,
-                        margin=ft.Margin(bottom=10),
+                        margin=ft.Margin(bottom=15),
                     ),
                     # Status Text
                     ft.Container(
                         content=self.status_text,
                         alignment=ft.Alignment.CENTER,
                     ),
-                ]
+                ],
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=10,
             ),
             bgcolor=ColorScheme.BACKGROUND,
             padding=50,
