@@ -18,6 +18,20 @@
     <ROW Section="Sola v3.1.1" Key="UpdatedApplications" Value="Sola[1.0-3.1.1)" ValueLocId="-"/>
     <ROW Section="Sola v3.1.1" Key="Description" Value="The latest update introduces comprehensive support for the ITR-Format (2026) and Form-16 (2026), enhancing compatibility and ensuring seamless integration with the updated standards."/>
     <ROW Section="Sola v3.1.1" Key="AutoCloseApplication" Value="[APPDIR]Sola.exe|;;NoRestart" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="Name" Value="Sola v3.2.0"/>
+    <ROW Section="Sola v3.2.0" Key="ProductVersion" Value="3.2.0.0" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="URL" Value="https://github.com/Krishna-Noutiyal/Sola/releases/download/v3.2.0/Sola.v3.2.0.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="Size" Value="release\Sola v3.2.0.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="ReleaseDate" Value="23745" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="SHA256" Value="release\Sola v3.2.0.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="MD5" Value="release\Sola v3.2.0.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="ServerFileName" Value="Sola v3.2.0.exe" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="Flags" Value="Critical" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="RegistryKey" Value="HKUD\Software\Krish\Sola\Version" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="Version" Value="3.2.0.0" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="UpdatedApplications" Value="Sola[1.0-3.1.1]" ValueLocId="-"/>
+    <ROW Section="Sola v3.2.0" Key="Description" Value="This latest update include a brand new Auto-Detect Feature that automatically detect the age and fills Form-16 accordingly."/>
+    <ROW Section="Sola v3.2.0" Key="AutoCloseApplication" Value="[APPDIR]Sola.exe|;;NoRestart" ValueLocId="-"/>
     <ATTRIBUTE name="OutputFileName" value="updates.txt"/>
     <ATTRIBUTE name="OutputFolder" value="."/>
   </COMPONENT>
