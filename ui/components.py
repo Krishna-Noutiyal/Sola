@@ -389,7 +389,7 @@ class MainView:
                     ft.Container(
                         content=self.submit_button,
                         alignment=ft.Alignment.CENTER,
-                        margin=ft.Margin(bottom=15),
+                        margin=ft.Margin(bottom=5),
                     ),
                     # Status Text
                     ft.Container(
