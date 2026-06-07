@@ -6484,7 +6484,7 @@
     <ROW UpgradeCode="{0468B821-8AD9-46E7-8BB5-65FBE3955791}" VersionMin="1.0" VersionMax="3.1.1" Language="1033" Attributes="773" ActionProperty="UPGRADE_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.ScheduledTasksComponent">
-    <ROW TaskId="AI_SolaUpdater" TaskName="Sola Updater" Run="[#updater.exe]" WorkDir="[APPDIR]" UserProp="[%UserDomain]\[LogonUser]" Flags="8192" Trigger="1|1|1|1|0|0|0||0|0|0" Settings="2|60" Condition="1" TaskVersion="2.0"/>
+    <ROW TaskId="AI_SolaUpdater" TaskName="Sola Updater" Run="[#updater.exe]" WorkDir="[APPDIR]" UserProp="[%UserDomain]\[LogonUser]" Comments="Daily updates Checker for Sola" Flags="25600" Trigger="1|1|1|1|0|0|0||18432|0|0" Settings="2|60" Condition="1" TaskVersion="2.0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SoftwareIdentificationComponent">
     <ATTRIBUTE name="LocalFile" value="regid.199509.com.example_ProductNam"/>
